@@ -1,0 +1,28 @@
+__pycache__/
+.venv/
+.DS_Store
+*.pyc
+database/*.sqlite
+data/raw/
+data/processed/
+data/exports/
+models/
+data/archives/
+
+# Local credentials and private connection settings
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+analysis_code/01_connect_to_mysql.py
+
+# Submission copies, backups and presentation/report working files
+PracticeHUB_Submission_Code/
+PracticeHUB_Submission_Code.zip
+database/backups/
+output/
+*.pptx
+*.docx
+*.zip
+tmp/
+.pytest_cache/

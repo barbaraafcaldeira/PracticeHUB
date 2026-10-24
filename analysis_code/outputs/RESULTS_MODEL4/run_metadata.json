@@ -1,0 +1,42 @@
+{
+  "generated_at_utc": "2026-10-15T19:56:28.067867+00:00",
+  "synthetic_data": true,
+  "protocol": "Expanding-window one-month-ahead; refit after each newly completed month",
+  "method": "StandardScaler fitted on training rows only, then Ridge",
+  "ridge_alpha": 10.0,
+  "features": [
+    "opening_days",
+    "bank_holidays",
+    "opening_mondays",
+    "previous_month_daily_requests",
+    "two_months_ago_daily_requests",
+    "previous_three_month_daily_mean",
+    "winter",
+    "spring",
+    "summer"
+  ],
+  "season_reference": "Autumn",
+  "training_target": "Recorded clinically indicated requests per opening day, separately for each appointment type",
+  "monthly_output": "Predicted daily rate multiplied by the target month's planned opening days",
+  "input_sha256": "d7afbc6c6d4d36bca65acdfb6297f007f83deb460a9f2c65cf1a7476870c8428",
+  "next_month_calendar": [
+    {
+      "kpi_month": "2026-01-01",
+      "opening_days": "21",
+      "bank_holidays": "1",
+      "opening_mondays": "4"
+    }
+  ],
+  "calendar_source": "https://www.gov.uk/bank-holidays",
+  "calendar_assumption": "Monday-Friday practice; closed on England bank holidays; no unexpected closures",
+  "limitations": [
+    "Only 36 original monthly observations; seasonal effects learned from few annual cycles",
+    "2025 has already been inspected during earlier experiments: not a fresh independent test",
+    "New one-month horizon: do not compare directly with fixed-origin annual Model 1/2 scores",
+    "Calendar is treated as known ahead; past target-period demand is never used in its own forecast",
+    "Latest observed month must be complete; do not add partial monthly KPI rows",
+    "January 2026 is next after the historical data cutoff, not the current real-world next month",
+    "No prediction intervals, appointment-capacity recommendations or session costs generated",
+    "Within +/-10% is an illustrative tolerance, not classification accuracy or an NHS standard"
+  ]
+}

@@ -1,0 +1,5 @@
+forecast_month,Target,point_forecast,opening_days,nominal_coverage_pct,lower_requests,upper_requests,calibration_observations,order_statistic_rank,absolute_daily_error_quantile,calibration_start,calibration_end
+2026-01-01,same_day_gp_requests,2323.3190823933064,21.0,80.0,1927,2719,24,20,18.828315052432004,2024-01-01,2025-12-01
+2026-01-01,same_day_gp_requests,2323.3190823933064,21.0,90.0,1825,2822,24,23,23.715841644631514,2024-01-01,2025-12-01
+2026-01-01,routine_gp_requests,801.0197964603635,21.0,80.0,612,990,24,20,8.974068972488805,2024-01-01,2025-12-01
+2026-01-01,routine_gp_requests,801.0197964603635,21.0,90.0,568,1034,24,23,11.057002399745382,2024-01-01,2025-12-01

@@ -1,0 +1,3 @@
+forecast_month,appointment_type,predicted_requests,planned_usable_slots,positive_gap_unrounded,additional_appointments_rounded_up
+2026-01-01,Same-day GP,2323.3190823933064,1103,1220.3190823933064,1221
+2026-01-01,Routine GP,801.0197964603635,788,13.019796460363523,14

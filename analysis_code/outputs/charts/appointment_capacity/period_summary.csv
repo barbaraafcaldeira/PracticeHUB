@@ -1,0 +1,3 @@
+slot_type,requests,bookable_slots,allocated_slots,weighted_utilisation_pct
+Routine GP,31506,25527.0,25495,99.87464253535472
+Same-day GP,61553,35732.0,34802,97.39729094369193

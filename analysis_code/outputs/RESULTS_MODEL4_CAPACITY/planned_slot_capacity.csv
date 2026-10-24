@@ -1,0 +1,3 @@
+appointment_type,nominal_slots,assumed_blocked_slots,planned_usable_slots
+Same-day GP,1120,17,1103
+Routine GP,800,12,788

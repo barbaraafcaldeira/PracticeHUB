@@ -1,0 +1,17 @@
+{
+  "forecast_month": "2026-01-01",
+  "bank_holiday_dates": ["2026-01-01"],
+  "bank_holiday_source": "https://www.gov.uk/bank-holidays",
+  "sessions_per_working_day": 2,
+  "slots_per_session": 12,
+  "same_day_slots_per_session": 7,
+  "routine_slots_per_session": 5,
+  "appointment_minutes": 15,
+  "non_slot_minutes_per_session": 30,
+  "blocked_slot_fraction": 0.015,
+  "approved_leave": [],
+  "leave_assumption": "No future leave supplied: provisional no-leave roster, not a confirmed staffing plan",
+  "blocked_slot_assumption": "1.5% blocked, carried forward from synthetic dataset assumptions; floor usable slots by appointment type",
+  "additional_session_assumption": "12 usable slots with no further blocking; requires additional resources",
+  "backlog_assumption": "Exclude existing backlog and cross-month routine booking flows from this initial monthly comparison"
+}

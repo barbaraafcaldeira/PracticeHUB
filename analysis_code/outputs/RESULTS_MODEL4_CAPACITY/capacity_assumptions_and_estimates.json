@@ -1,0 +1,40 @@
+{
+  "synthetic_data": true,
+  "forecast_month": "2026-01-01",
+  "opening_days": 21,
+  "existing_roster_sessions": 160,
+  "additional_appointments": 1235,
+  "flexible_mix_session_equivalents_lower_bound": 103,
+  "fixed_7_same_day_5_routine_session_equivalents": 175,
+  "forecast_sha256": "70b199e4c6f0dffad4d89fa65aae8c414d3cfc308126c0d46b9de6002e4ead49",
+  "assumptions": {
+    "forecast_month": "2026-01-01",
+    "bank_holiday_dates": [
+      "2026-01-01"
+    ],
+    "bank_holiday_source": "https://www.gov.uk/bank-holidays",
+    "sessions_per_working_day": 2,
+    "slots_per_session": 12,
+    "same_day_slots_per_session": 7,
+    "routine_slots_per_session": 5,
+    "appointment_minutes": 15,
+    "non_slot_minutes_per_session": 30,
+    "blocked_slot_fraction": 0.015,
+    "approved_leave": [],
+    "leave_assumption": "No future leave supplied: provisional no-leave roster, not a confirmed staffing plan",
+    "blocked_slot_assumption": "1.5% blocked, carried forward from synthetic dataset assumptions; floor usable slots by appointment type",
+    "additional_session_assumption": "12 usable slots with no further blocking; requires additional resources",
+    "backlog_assumption": "Exclude existing backlog and cross-month routine booking flows from this initial monthly comparison"
+  },
+  "limitations": [
+    "No future leave supplied: existing roster is a provisional no-leave upper scenario, not confirmed capacity",
+    "Blocked-slot count is an assumption, not an observed future count",
+    "Flexible session equivalents require tailoring the appointment mix, not keeping a seven/five split",
+    "Extra sessions assume twelve usable slots; extra clinician and room resources have not been established",
+    "Monthly request intake and scheduled slots are not identical cohorts, especially for routine requests",
+    "No carry-in backlog, routine carry-out, within-month timing or patient-level allocation is modelled",
+    "This is a point-forecast planning estimate, not proof these sessions meet every request deadline",
+    "No uncertainty interval, session cost or optimal purchasing decision is provided",
+    "January 2026 follows the historical dataset cutoff; this is not the current live practice position"
+  ]
+}

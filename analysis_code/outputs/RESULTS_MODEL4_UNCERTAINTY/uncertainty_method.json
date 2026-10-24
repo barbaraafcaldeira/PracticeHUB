@@ -1,0 +1,38 @@
+{
+  "generated_at_utc": "2026-10-16T13:35:02.231887+00:00",
+  "synthetic_data": true,
+  "point_model_changed": false,
+  "source_files_sha256": {
+    "2024_walk_forward_predictions.csv": "fab0522ceac7540a7b1bbec01fd0223e1a962cb165f8069095a6385f6d9045c3",
+    "2025_walk_forward_predictions.csv": "3d51e0140c25d3b4565d5af47726055ff9d3e4830bffd2fd19695d1f4f6a6002",
+    "next_month_forecast.csv": "70b199e4c6f0dffad4d89fa65aae8c414d3cfc308126c0d46b9de6002e4ead49",
+    "model_input_snapshot.csv": "d7afbc6c6d4d36bca65acdfb6297f007f83deb460a9f2c65cf1a7476870c8428"
+  },
+  "nominal_coverage_levels": [
+    0.8,
+    0.9
+  ],
+  "minimum_calibration_errors": 12,
+  "calibration_score": "abs(actual - prediction) / opening_days, using completed one-month-ahead forecast errors",
+  "quantile_rule": "Sorted absolute daily errors at rank ceil((n+1)*coverage), one-based; reject rank > n",
+  "interval_rule": "point +/- daily-error quantile * target opening days; lower floored at zero; integer endpoints rounded outward",
+  "sequential_protocol": "Build interval from earlier errors, evaluate current month, then append its error",
+  "next_month_protocol": "Use completed January 2024-December 2025 forecast errors, separately for each target",
+  "references": [
+    "https://arxiv.org/abs/2106.00170",
+    "https://scikit-learn.org/stable/auto_examples/applications/plot_time_series_lagged_features.html"
+  ],
+  "limitations": [
+    "Empirical, conformal-style prediction bands, not confidence intervals for an average",
+    "Temporal dependence and refitted models mean no formal exchangeable split-conformal coverage guarantee is claimed",
+    "Coverage percentages are nominal targets, not forecast accuracy or promises for a particular month",
+    "Only 12 historical months evaluate each band; one month changes coverage by 8.33 percentage points",
+    "2025 was previously inspected; this is exploratory sequential calibration/evaluation, not a fresh independent test",
+    "24 completed errors calibrate January 2026; no independent season-specific calibration is possible at this size",
+    "Bands are separate for each appointment type, not a joint simultaneous interval for total demand",
+    "Summing type-specific endpoints gives scenarios, not a calibrated combined coverage level",
+    "Normalising errors by opening days assumes error size scales approximately with the opening calendar",
+    "January 2026 follows the dataset cutoff; it is not the next month relative to today's date",
+    "Any capacity gaps retain the earlier no-future-leave and blocked-slot assumptions, not staffing guarantees"
+  ]
+}

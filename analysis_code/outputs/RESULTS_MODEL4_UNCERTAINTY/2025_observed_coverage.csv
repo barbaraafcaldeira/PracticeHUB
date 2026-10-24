@@ -1,0 +1,5 @@
+Target,nominal_coverage_pct,evaluated_months,covered_months,observed_coverage_pct,average_band_width_requests,mean_interval_score
+routine_gp_requests,80.0,12,11,91.66666666666666,420.9166666666667,498.4166666666667
+routine_gp_requests,90.0,12,11,91.66666666666666,462.9166666666667,564.5833333333334
+same_day_gp_requests,80.0,12,9,75.0,842.0833333333334,1067.9166666666667
+same_day_gp_requests,90.0,12,12,100.0,1106.6666666666667,1106.6666666666667

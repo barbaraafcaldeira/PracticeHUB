@@ -1,0 +1,119 @@
+PracticeHUB Dataset Update Prompt
+
+REVIEW STATUS
+This file is the master record of agreed dataset changes. V2 was rebuilt on 15 October 2026. The request-led changes below have been applied to the generator, local CSV/SQLite datasets and live MySQL, with backups and validation reports. Forecasting and repeat EDA remain for the user's next analysis.
+
+AGREED CHANGE CHECKLIST
+[x] Implement winter request peaks and summer dips. Latest capacity-constrained scenario supersedes the earlier forced 60% summer utilisation target; calculated utilisation is documented in the validation report and must be reviewed in EDA.
+[x] Reconcile GP bookings with eligible capacity, staffing patterns, working days, holidays, and leave.
+[x] Track appointment requests and patients not allocated a suitable appointment by the required date.
+[x] Implement 08:00 to before 10:00 call measures, including distinct request/patient counts.
+[x] Add Signposted eConsult outcomes and reasons; distinguish capacity-related signposting from appropriate redirection.
+[x] Link contacts to requests and patients to prevent duplicate demand counts.
+[x] Replace the invalid bookings + GP-recommended eConsults + complaints demand calculation.
+[x] Update schemas, generator, imports, KPI definitions, ERD, and data dictionary.
+[x] Regenerate, validate, back up and refresh MySQL, and recalculate 36 monthly KPI rows.
+[ ] Repeat the user's EDA and subsequently develop forecasting; no model outputs have been invented.
+
+Use this prompt at the end of the exploratory data analysis and forecasting review to update the synthetic dataset generator, regenerate the CSV/database files, re-import into MySQL, and rerun KPI and forecasting outputs.
+
+Context:
+PracticeHUB is a synthetic NHS GP Practice Management Intelligence application for a fictional GP practice in England. The final dataset should represent 10,000 registered patients, 5 GPs with varied working patterns, 36 months of historical activity, and realistic appointment, eConsult, telephone, complaint, KPI, and forecasting data.
+
+Main objective:
+Review the current synthetic dataset and update the generator so the data better supports the business objective: helping a Practice Manager understand historical appointment activity, forecast future GP appointment requirements, and estimate additional GP sessions needed.
+
+Global data quality instruction:
+The updated dataset must be reliable, internally consistent, and proportionate to real-world NHS GP practice operations. Volumes, rates, trends, seasonal changes, appointment utilisation, telephone workload, eConsult outcomes, complaints, cancellations, DNAs, and staffing capacity should behave plausibly when compared with how a busy NHS practice would operate. Do not create artificial patterns only to make charts look interesting; every generated pattern should have a realistic operational explanation.
+
+Dataset update decisions to apply:
+
+Historical decision log: section 6 and the V2 checklist above supersede the earlier forced 60% summer utilisation target in sections 1-2. Current active assumptions are documented in final_dataset_assumptions.md.
+
+1. Model seasonal GP slot utilisation within a 60% to 100% range.
+   - Current issue: Monthly GP slot utilisation is mostly around 85% to 88%.
+   - Revised user requirement: Monthly GP slot utilisation must range from 60% to 100%, with lower summer utilisation and higher winter utilisation. This replaces the earlier 96% to 99% usual utilisation and 92% to 95% occasional-dip targets.
+   - Include a recurring summer dip, particularly during June to August, and a winter peak, particularly during December to February, across the 36-month period.
+   - Allow low-pressure summer months to approach 60% and high-pressure winter months to approach or reach 100%. Do not require either exact endpoint in every year.
+   - Retain reasonable year-to-year and month-to-month variation, with transitions between seasons rather than identical repeated monthly values.
+   - Document this seasonal pattern and utilisation range as explicit assumptions for the fictional practice, not as established NHS-wide benchmarks.
+   - Generate the pattern through appointment booking and eligible bookable capacity, then calculate utilisation from those records. Validate that every monthly value stays within 60% to 100% and that average winter utilisation exceeds average summer utilisation in each year.
+   - Do not simply force every slot to be booked. Keep cancellations, DNAs, blocked slots, and realistic access-pressure signals.
+
+2. Review monthly GP slots booked following the second EDA chart.
+   - Observation: Booked slots fluctuate approximately between 1,150 and 1,375 per month, without a clear sustained trend. These values alone do not establish whether capacity is adequate or demand is increasing.
+   - Affected source tables: clinicians, clinic_sessions, appointment_slots, and appointments. Recalculate monthly_kpis and the KPI views after updating those sources; do not manually edit the monthly totals.
+   - Reconcile generated sessions with each GP's working pattern, FTE, session duration, and appointment slot length. Exclude Admin slots from patient-facing GP appointment capacity and booking measures.
+   - Implement the England bank holiday calendar and explicit leave/absence assumptions. Closures and leave should reduce available sessions/capacity; they should not automatically reduce the booking percentage of the remaining bookable slots.
+   - Apply the revised seasonal 60% to 100% utilisation scenario consistently to eligible GP slots, documenting the chosen percentages as synthetic modelling assumptions pending validation against suitable evidence.
+   - Investigate low-booking months, particularly June 2024 and November 2025, against available slots, sessions, and working days. Retain dips supported by those inputs and correct unexplained generator effects.
+   - Compare monthly bookings with bookable capacity, bookings per working day, and bookings per GP session to distinguish calendar effects from changes in booking pressure.
+   - Define how cancellations, rebooking, DNAs, and final slot status affect the KPI. An appointment cancelled and subsequently refilled must not be counted as two occupied slots; a DNA is not an unused booking.
+   - Keep recorded bookings separate from total appointment demand. Capacity-limited bookings cannot reveal all unmet demand, and complaints must not be added to appointment counts as if each complaint represented an additional appointment.
+   - Do not force an upward trend or smoother pattern to improve the forecasting story or model metrics. Revise the generator only for documented operational or data-quality reasons.
+
+3. Track appointment requests that the surgery could not accommodate.
+   - Business question: How many unique patients requested a GP appointment but were not allocated a suitable appointment by the required date?
+   - Add appointment_requests (or an equivalent request-level structure) with request_id, patient_id, requested_datetime, request_channel, required_clinician_type, required_by_date, request_outcome, non_allocation_reason, and optional appointment_id/econsult_id links.
+   - Record whether the required appointment date has passed and whether a suitable booking was allocated by that deadline. Keep pending requests whose deadlines have not passed separate from overdue/unaccommodated requests.
+   - Define the reporting as-of date explicitly. Historical records ending in December 2025 cannot describe the current live position in 2026.
+   - Incoming calls: prioritise the 08:00 <= call time < 10:00 access window. Record appointment intent, allocation outcome, and non-allocation reason such as no suitable capacity, awaiting triage, patient declined, or other reason. Keep this window-labelled measure separate from the all-day total.
+   - An abandoned call does not establish appointment intent or an unaccommodated GP request unless a linked identified request provides that information. Report unknown intent/patient identity separately.
+   - eConsults: introduce Signposted as a triage outcome, with signposting_reason and signposting_destination. Distinguish appropriate clinical/care-navigation redirection from signposting because no suitable GP appointment was available.
+   - Count capacity-related signposting as unmet GP appointment need only where a GP appointment requirement is established and remains unallocated by the required date. Do not count every Signposted eConsult as unmet GP demand.
+   - Link incoming_call_events and eConsult contacts to request_id, with consistent patient identity. Repeated calls and an eConsult about the same request must not create multiple demand episodes.
+   - Report distinct patients and distinct requests separately. A patient can have more than one genuine request; repeated contacts about one request are not new requests.
+   - Core outputs: unique patients not allocated suitable GP appointments by the required date; distinct unaccommodated GP requests; percentage of eligible GP requests allocated on time; pending requests; and capacity-related non-allocation counts, split by telephone/eConsult route.
+   - Keep route-specific counts separate and deduplicate the combined total across channels; do not simply add unique-patient counts from each route.
+   - Replace estimated_gp_appointment_demand_signal in the existing KPI SQL. Adding booked appointments, all GP-recommended eConsults, and complaints double-counts activity and treats complaints as appointment quantities.
+   - Derive recorded GP request demand from distinct eligible request episodes, with allocated, pending, and unmet outcomes. Keep complaints as a separate access indicator. This still does not measure people who needed care but never contacted the surgery.
+   - Validate the new request outcomes against booking timestamps, appointment suitability, patient IDs, eConsult links, and slot availability. If low monthly utilisation coexists with unmet need, document the relevant timing, urgency, clinician, or appointment-type mismatch rather than assuming aggregate unused slots could satisfy every request.
+
+4. Preserve important analytical rules.
+   - eConsult requests must not automatically equal GP appointment demand.
+   - Telephone calls must not directly equal appointment demand.
+   - Complaints must remain indirect indicators of access difficulty.
+   - Forecast accuracy must be calculated from held-out historical observations.
+   - Synthetic data must remain clearly labelled.
+
+5. After modifying the generator, repeat the full refresh workflow.
+   - Update SQLite/MySQL schemas, CSV headers, import scripts, KPI views/table fields, ERD, and data dictionary to reflect the agreed request-tracking changes.
+   - Regenerate final CSV files and SQLite database.
+   - Re-import the updated CSVs into MySQL.
+   - Rerun KPI views and repopulate monthly_kpis.
+   - Re-run pandas/seaborn exploratory analysis.
+   - Re-run forecasting and save predictions and evaluation metrics in the model-result files. Do not recreate the retired forecast_results or model_evaluations database tables.
+   - Re-check row counts, database size, KPI plausibility, and chart outputs.
+
+6. Latest business scenario: eConsult-led access and capacity planning.
+   - Model a fictional capacity-constrained English GP practice. Treat this as the selected practice scenario, not a claim that every NHS practice follows this workflow or has identical access problems.
+   - Every appointment request must have an eConsult intake record. Patients can submit directly; reception staff complete an assisted eConsult for telephone/reception requests. Preserve original_contact_channel, submitted_by_role, and linked contact/request IDs so assisted forms are not counted as new demand.
+   - Triage outcomes must distinguish: same-day GP appointment, routine GP appointment, signposted because suitable practice capacity was exhausted, and signposted as the appropriate normal care pathway. Also retain pending triage and other necessary request states so unfinished work is not forced into a completed outcome.
+   - Record clinical GP appointment requirement, urgency, required-by date, triage timestamp, decision reason, destination (including NHS 111 or PCN-supported appointments where applicable), and allocation timestamp. Signposting destinations alone must not determine whether the cause was lack of capacity.
+   - Model outbound follow-up calls after triage, including multiple contact attempts, unsuccessful contact, communication of the decision, and any resulting booking. An answered call is not automatically a booking. All linked records must refer to the same patient and request and follow a valid chronological order.
+   - Distinguish internal practice booking, confirmed external/PCN booking, advice to seek external care, and unresolved need. An external booking can meet the patient's need while still indicating practice capacity displacement; advice to contact another service is not proof that care was received.
+   - Represent persistent access pressure, appropriate same-day/routine booking, capacity-related diversion, and elevated access complaints with documented scenario parameters. Generate complaints in relation to access experiences; do not fabricate complaints merely to hit a desired chart shape.
+   - Reconcile the latest exhausted-capacity scenario with the earlier 60% to 100% monthly utilisation range before regeneration. A summer demand dip need not mean 60% utilisation. If utilisation is low while requests are diverted, the data must demonstrate a suitable-slot timing/type mismatch; otherwise revise the conflicting assumption explicitly rather than encoding contradictory conditions.
+   - Forecast distinct clinically indicated GP requests and compare them with usable same-day/routine capacity over matching time periods. Do not forecast booked activity alone as total demand or add eConsult/contact/complaint counts together.
+   - Estimate additional appointments from the positive gap between forecast eligible requirements and planned suitable capacity, accounting for outstanding backlog without counting it twice. Translate appointment gaps to sessions using explicit usable appointments-per-session assumptions and round session requirements up.
+   - For expense control, compare capacity options with explicit session-cost, staffing, utilisation, backlog, and service-level assumptions; report uncertainty and distinguish scenario cost estimates from actual expenditure. Do not invent a single optimal session count without assumptions and evaluation.
+   - Visualisations should test and explain the scenario: eligible requests versus suitable capacity; internal bookings versus capacity-related diversion; same-day versus routine shortfalls; repeat contact workload; access complaints; and extra-session/cost scenarios. Show results even where they do not support additional capacity.
+   - Dataset changes must be justified by operational evidence or explicitly disclosed fictional assumptions, not by a wish to prove a conclusion or improve held-out model scores. Keep the final evaluation period untouched during model selection and disclose dataset revisions.
+
+Items to add after further review:
+- Add any unrealistic chart patterns found during EDA.
+- Add any forecasting metric concerns, especially high MAE or WAPE.
+- Add any weak relationships between demand indicators and appointment activity.
+- Add any table/field changes needed for the final dashboard.
+
+7. Implemented chart-review revision v2.1 (15 October 2026).
+   - Replace fixed same-day/routine intake proportions with separate reproducible streams: acute winter pressure for same-day requests, spring/autumn review cycles for routine requests, and a separate appropriate-other-service stream. Preserve legitimate shared influences; do not force anticorrelation or edit monthly KPI values directly.
+   - Chart 1: annotate the total-demand peak and trough; retain the descriptive trailing mean, not a forecast.
+   - Chart 2: retain the year-by-year monthly comparison using revised data. Do not implement the previous observation-count suggestion.
+   - Chart 3: retain demand per actual opening day; export opening-day and opening-Monday counts for calendar interpretation and later modelling.
+   - Chart 4: separate same-day/routine bookable capacity, allocations and booking utilisation; display attended, DNA, patient-cancelled and practice-cancelled outcomes separately.
+   - Chart 5: display only three stacked areas: internal GP booking, appropriate signposting, capacity-related signposting. Use all eConsult intakes, not only clinically indicated GP requests. Disclose excluded pending requests. Do not label signposting as confirmed external appointment allocation.
+   - Chart 6: retain the existing measures and presentation, refreshed from source data.
+   - Chart 7: combine unmet patients across intake routes without double counting. Generate complaints from actual capacity diversion, waiting, cancellations, repeat contact and failed communication, with recorded triggers and reporting delays. Show access complaints by trigger, not an artificial constant fraction of monthly demand.
+   - Chart 8: retain the calendar-adjusted heatmap, refreshed from source data.
+   - Rebuild and validate source records, CSVs, SQLite, MySQL and monthly KPIs; retain backups. Update charts and assumptions. Forecasting remains a separate future task; do not invent model scores or tune the dataset to obtain favourable scores.
